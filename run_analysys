@@ -1,0 +1,47 @@
+Enter file contents here
+
+
+run_analysis <-function()
+{
+  X_test  <- read.table("./UCI HAR Dataset/test/X_test.txt")
+  X_train  <- read.table("./UCI HAR Dataset/train/X_train.txt")
+  X_value  <- rbind(X_test, X_train)
+  
+  y_test <- read.table("./UCI HAR Dataset/test/y_test.txt") 
+  y_train <- read.table("./UCI HAR Dataset/train/y_train.txt") 
+  Y_value  <- rbind(y_test, y_train)
+   
+  subject_test <- read.table("./UCI HAR Dataset/test/subject_test.txt") 
+  subject_train <- read.table("./UCI HAR Dataset/train/subject_train.txt") 
+  subject_value  <- rbind(subject_test, subject_train)
+  
+  features <-read.table("./UCI HAR Dataset/features.txt")
+  colnames(X_value) <-features[,2]
+  colnames(Y_value) <-"Activity"
+  colnames(subject_value) <-"Subject"
+  
+  selection <- X_value[,grep(".*Mean.*|.*Std.*", names(X_value), ignore.case=TRUE)]
+  dataset <- cbind(selection, Y_value, subject_value)
+  
+  names(dataset)<-gsub("Acc", "Accelerometer", names(dataset))
+  names(dataset)<-gsub("Gyro", "Gyroscope", names(dataset))
+  names(dataset)<-gsub("BodyBody", "Body", names(dataset))
+  names(dataset)<-gsub("Mag", "Magnitude", names(dataset))
+  names(dataset)<-gsub("^t", "Time", names(dataset))
+  names(dataset)<-gsub("^f", "Frequency", names(dataset))
+  names(dataset)<-gsub("tBody", "TimeBody", names(dataset))
+  names(dataset)<-gsub("-mean()", "Mean", names(dataset), ignore.case = TRUE)
+  names(dataset)<-gsub("-std()", "STD", names(dataset), ignore.case = TRUE)
+  names(dataset)<-gsub("-freq()", "Frequency", names(dataset), ignore.case = TRUE)
+  names(dataset)<-gsub("angle", "Angle", names(dataset))
+  names(dataset)<-gsub("gravity", "Gravity", names(dataset))
+  
+  
+  aggdata <-aggregate(dataset[,], by=dataset[c("Activity","Subject")], FUN=mean)
+  write.table(aggdata, "tidy.data.txt", sep="\t", row.names=FALSE, col.names=FALSE) 
+  
+  
+  
+ 
+  
+}
